@@ -2,7 +2,7 @@ from django.shortcuts import render
 import datetime
 import hashlib
 import json
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 
 
 class Blockchain:
@@ -91,3 +91,16 @@ def is_valid(request):
         else:
             response = {'message': 'Sir, we have a problem. The Blockchain is not valid.'}
     return JsonResponse(response)
+
+
+# Adding transactio to Block Chain
+def connect_node(request):
+    if request.method == 'POST':
+        receieved_json = json.loads(request.body)
+        transaction_keys = ['sender', 'receiver', 'amount', 'time']
+        if not all(keys in receieved_json for keys in transaction_keys):
+            return 'Some elements of the transaction are missing', HttpResponse(status=400)
+        index = blockchain.add_transaction(receieved_json['sender'], receieved_json['receiver'],
+                                           receieved_json['sender'], receieved_json['time'])
+        response = {'message': f' This transaction will be added to the Block {index}'}
+        return JsonResponse(response)
